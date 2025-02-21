@@ -59,7 +59,7 @@ cat <<EOF
     <!-- Popup qui s'affiche lors d'un clic sur une ressource -->
     <div id="popup">
         <img id="popup_img" src="">
-        <video id="popup_video" src="">
+        <video id="popup_video" src=""> </video> 
     </div>
     <script>
         // Lorsque le DOM est complètement chargé
@@ -149,12 +149,38 @@ cat <<EOF
 
                             carouselHtml += \`
                                 <div class="carousel-item \${first ? 'active' : ''}">
-                                    <div class="ratio ratio-1x1">
-                                        <img src="\${imgSrc}" class="d-block w-100 h-100 object-fit-contain" alt="\${img_alt}">
-                                        <div class="carousel-caption bg-dark bg-opacity-25 p-2">
-                                            <h6>\${img_name}</h6>
-                                            <p>\${img_alt}</p>
-                                        </div>
+                                    <div class="ratio ratio-1x1">\`;
+                            
+                            // Si le fichier est un SVG, on utilise <object> pour l'afficher
+                            if (imgSrc.slice(-3) === "svg"){
+                                carouselHtml += \`<object data="\${imgSrc}" type="image/svg+xml" class="img-fluid w-100 h-100 object-fit-contain" alt="\${img_alt}"></object>\`;
+                            }
+                            else{
+                            // Sinon, on affiche l'image avec la balise <img>
+                                carouselHtml += \`<img src="\${imgSrc}"  class="d-block w-100 h-100 object-fit-contain" alt="\${img_alt}">\`;
+                            }
+                            carouselHtml += \`
+                                    <div class="carousel-caption bg-dark bg-opacity-25 p-2">
+                                        <h6>\${img_name}</h6>
+                                        <p>\${img_alt}</p>
+                                    </div>
+                                </div>
+                            </div>\`;
+
+                            first = false;
+                        }
+                        else if (row.dataset.type == "VIDEO") {
+                            const vidSrc = row.dataset.src;
+                            const vid_td = row.querySelectorAll("td");
+                            let vid_name = vid_td[0].textContent;
+
+                            carouselHtml += \`
+                                <div class="carousel-item \${first ? 'active' : ''}">
+                                    <div class="ratio ratio-16x9">
+                                        <video src="\${vidSrc}" class="d-block w-100 h-100 object-fit-contain" controls> </video>
+                                    </div>
+                                    <div class="carousel-caption bg-dark bg-opacity-25 p-2">
+                                        <h6>\${vid_name}</h6>
                                     </div>
                                 </div>\`;
 
@@ -169,24 +195,22 @@ cat <<EOF
 
                     first = true;
                     let index = 0;
-                    // Créer les indicateurs du carousel pour chaque image
+                    // Créer les indicateurs du carousel
                     document.querySelectorAll("#table tbody tr").forEach(row => {
-                        if (row.dataset.type == "IMAGE") {
-                            carouselHtml += \`
-                                <button type="button" data-bs-target="#carousel" data-bs-slide-to="\${index}" \${first ? 'class="active"' : ''}></button>
-                            \`;
-                            first = false;
-                            index++;
-                        }
+                        carouselHtml += \`
+                            <button type="button" data-bs-target="#carousel" data-bs-slide-to="\${index}" \${first ? 'class="active"' : ''}></button>
+                        \`;
+                        first = false;
+                        index++;
                     });
 
                     carouselHtml += \`
                                 </div>
-                                <button class="carousel-control-prev" type="button" data-bs-target="#carousel" data-bs-slide="prev">
-                                    <span class="carousel-control-prev-icon"></span>
+                                <button class="carousel-control-prev w-auto h-auto pe-none position-absolute top-50 start-0 translate-middle-y" type="button" data-bs-target="#carousel" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon pe-auto"></span>
                                 </button>
-                                <button class="carousel-control-next" type="button" data-bs-target="#carousel" data-bs-slide="next">
-                                    <span class="carousel-control-next-icon"></span>
+                                <button class="carousel-control-next w-auto h-auto pe-none position-absolute top-50 end-0 translate-middle-y" type="button" data-bs-target="#carousel" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon pe-auto"></span>
                                 </button>
                             </div>
                         </div>\`;
@@ -231,9 +255,11 @@ cat <<EOF
                             const videoSrc = row.dataset.src;
                             if (videoSrc) {
                                 gallerieHtml += \`
-                                <div class="col-6">
-                                     <div class="ratio ratio-1x1">
-                                        <video src="\${videoSrc}" controls class="w-100 h-100 object-fit-contain"> </video>
+                                <div class="col-md-3">
+                                    <div class="ratio ratio-1x1">
+                                        <div class="ratio ratio-16x9">
+                                            <video src="\${videoSrc}" class="position-absolute top-50 start-50 translate-middle w-auto h-auto mw-100 mh-100" controls> </video>
+                                        </div>
                                     </div>
                                 </div>
                                 \`;
