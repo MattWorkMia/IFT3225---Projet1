@@ -1,6 +1,8 @@
 // Lorsque le DOM est complètement chargé
 document.addEventListener("DOMContentLoaded", function() {
     // Récupération des éléments nécessaires
+    const popup_img = document.getElementById("popup_img");
+    const popup_video = document.getElementById("popup_video");
     const view = document.getElementById("view");
     const table_view_html = view.innerHTML; // Sauvegarde de la vue initiale (tableau)
     const popup = document.getElementById("popup");
